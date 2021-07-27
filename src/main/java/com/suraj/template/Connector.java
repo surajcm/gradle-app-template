@@ -1,6 +1,9 @@
 package com.suraj.template;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,8 +12,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public class connector {
-    private static connector single_instance = null;
+public class Connector {
+    private static final Logger logger = LogManager.getLogger(Connector.class);
+
+    private static Connector singleInstance = null;
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)
             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -18,14 +23,14 @@ public class connector {
             .build();
     private static final String AUTH = "<TOKEN>";
 
-    private connector() {
+    private Connector() {
     }
 
-    public static connector getInstance() {
-        if (single_instance == null) {
-            single_instance = new connector();
+    public static Connector getInstance() {
+        if (singleInstance == null) {
+            singleInstance = new Connector();
         }
-        return single_instance;
+        return singleInstance;
     }
 
     public static String getResponse(String id) {
@@ -33,18 +38,19 @@ public class connector {
         String urlPart = "/breadcrumbs";
         final HttpRequest request = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(url+id+urlPart))
+                .uri(URI.create(url + id + urlPart))
                 .setHeader("accept", "application/json")
-                .setHeader("authorization", "JWT-Bearer "+AUTH)
+                .setHeader("authorization", "JWT-Bearer " + AUTH)
                 .build();
         final HttpResponse<String> response;
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         StringBuilder builder = new StringBuilder();
         try {
             response = HTTP_CLIENT
                     .send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
-
+            logger.info(response.body());
+            builder.append(mapper.readValue(response.body(), String.class));
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

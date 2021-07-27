@@ -1,9 +1,14 @@
 package com.suraj.template;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class TemplateApp {
-	public static void main(String args[]) {
-		System.out.println("Starting to process !!!");
-		System.out.println("Done with process !!!");
-	}
+    private static final Logger logger = LogManager.getLogger(TemplateApp.class);
+
+    public static void main(String args[]) {
+        logger.info("Starting to process !!!");
+        logger.info("Done with process !!!");
+    }
 }
