@@ -3,7 +3,7 @@ apply plugin: 'application'
 apply plugin: 'idea'
 
 mainClassName = 'com.suraj.template.TemplateApp'
-sourceCompatibility = '11'
+sourceCompatibility = '18'
 
 version = '1.0'
 
